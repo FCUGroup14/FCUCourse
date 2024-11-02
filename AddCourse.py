@@ -10,8 +10,10 @@ sheet = courseData.worksheets[:]
 print(sheet)
 
 #
-Courses = pd.read_excel('courses.xlsx', sheet_name='Courses',index_col=0,usecols="A,B,C,D,I,J,K,L")
+Courses = pd.read_excel('courses.xlsx', sheet_name='Courses',usecols="A,B,C,D,I,J,K,L")
 print(Courses)
+for row in Courses:
+	print(row)
 
 # 讀取學生選課資料
 student_df = pd.read_excel('courses.xlsx', sheet_name='StudentEnrollments')
