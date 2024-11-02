@@ -1,22 +1,23 @@
-import pandas as pd
+import pandas as pd # type: ignore
+from openpyxl import load_workbook # type: ignore
+import openpyxl
 
-# 讀取課程資料
-course_df = pd.read_excel('courses.xlsx', sheet_name='Courses')
+# 讀取excel檔
+courseData = load_workbook('courses.xlsx')
+
+print(f'目前使用{courseData.active}')
+sheet = courseData.worksheets[:]
+print(sheet)
+
+#
+Courses = pd.read_excel('courses.xlsx', sheet_name='Courses',index_col=0,usecols="A,B,C,D,I,J,K,L")
+print(Courses)
 
 # 讀取學生選課資料
 student_df = pd.read_excel('courses.xlsx', sheet_name='StudentEnrollments')
+# print(student_df)
 
-def add_course(student_id, course_id):
-    # 檢查課程是否已存在，若不存在則加入
-    if not ((student_df['student_id'] == student_id) & (student_df['course_id'] == course_id)).any():
-        new_enrollment = {'student_id': student_id, 'course_id': course_id}
-        student_df.append(new_enrollment, ignore_index=True)
-    else:
-        print("學生已選修該課程")
+# def add_course(student_id, course_id):
 
-# 範例：加選學生 123 的課程 'CS101'
-add_course(123, 'CS101')
 
-# 將結果存回 Excel
-with pd.ExcelWriter('courses.xlsx', engine='openpyxl', mode='a') as writer:
-    student_df.to_excel(writer, sheet_name='StudentEnrollments', index=False)
+courseData.save('courses.xlsx')
