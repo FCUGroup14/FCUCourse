@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>課程查詢</title>
+    <style>
+        /* 表格樣式 */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+            white-space: nowrap; /* 防止自動換行 */
+        }
+        .table th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<!--
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector("form");
+        const weekSelect = document.getElementById("week");
+        const timeSelect = document.getElementById("time");
+
+        form.addEventListener("submit", function(event) {
+            if (weekSelect.value && !timeSelect.value) {
+                event.preventDefault();
+                alert("請選擇課程時間。");
+                timeSelect.focus();
+            }
+        });
+    });
+</script>
+-->
+
+<body>
+    <h1>選課系統</h1>
+    <h2>課程搜尋</h2>
+    <form method="post">
+        <label for="number">課程代碼:</label>
+        <input type="text" id="number" name="number"><br><br>
+
+        <label for="name">課程指導老師名字:</label>
+        <input type="text" id="name" name="name"><br><br>
+
+        <label for="time">上課時間：</label>
+        <select name="week" id="week">
+            <option value="">--星期幾--</option>
+            <option value="星期一">星期一</option>
+            <option value="星期二">星期二</option>
+            <option value="星期三">星期三</option>
+            <option value="星期四">星期四</option>
+            <option value="星期五">星期五</option>
+        </select>
+        <select name="time" id="time">
+            <option value="">--課程時間--</option>
+            <option value="08:10~9:00">08:10~9:00</option>
+            <option value="09:10~10:00">09:10~10:00</option>
+            <option value="10:10~11:00">10:10~11:00</option>
+            <option value="11:10~12:00">11:10~12:00</option>
+            <option value="13:10~14:00">13:10~14:00</option>
+            <option value="14:10~15:00">14:10~15:00</option>
+            <option value="15:10~16:00">15:10~16:00</option>
+            <option value="16:10~17:00">16:10~17:00</option>
+        </select><br><br>
+
+        <input type="submit" value="查詢">
+    </form>
+
+    {% if result %}
+        <h2>查詢結果:</h2>
+        <!-- 渲染表格結果 -->
+        <div>{{ result | safe }}</div>
+    {% elif error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+</body>
+</html>
