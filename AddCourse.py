@@ -1,50 +1,55 @@
 from flask import Flask, request, jsonify
 import pandas as pd
 from datetime import datetime
+import sys
+import io
+
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 app = Flask(__name__)
 MAX_CREDITS = 25  # 假設學分上限為 25
 
+# 重新定義 courses 表的欄位名稱
+COURSES_COLUMNS = [
+    "day", "time", "course_id", "course_name", "teacher", 
+    "location", "extra_info", "grades", "credits", 
+    "max_capacity", "enrolled"
+]
+
 def parse_time(course_time):
-    # 假設時間格式為 "週一 09:00-11:00"
-    day, hours = course_time.split()
-    start_time, end_time = hours.split("-")
-    
-    # 將「週幾」轉成數字方便比較
-    day_mapping = {"週一": 1, "週二": 2, "週三": 3, "週四": 4, "週五": 5}
-    day_num = day_mapping[day]
-    
-    # 將時間轉成 datetime 格式
+    # 假設時間格式為 "10:10~11:00"
+    start_time, end_time = course_time.split("~")
     start_time = datetime.strptime(start_time, "%H:%M").time()
     end_time = datetime.strptime(end_time, "%H:%M").time()
-    
-    return day_num, start_time, end_time
+    return start_time, end_time
 
 def is_conflict(time1, time2):
-    # 解析兩個課程的時間
-    day1, start1, end1 = parse_time(time1)
-    day2, start2, end2 = parse_time(time2)
-    
-    # 比較是否同一天且時間重疊
-    if day1 == day2:
-        if (start1 < end2) and (end1 > start2):
-            return True
-    return False
+    start1, end1 = parse_time(time1)
+    start2, end2 = parse_time(time2)
+    return (start1 < end2) and (end1 > start2)
 
 def add_course(student_id, course_id):
-    # 讀取 Excel 檔案的不同 sheet
+    # 讀取 Excel 檔案，設置 courses 表的列名
     data = pd.read_excel("course_data.xlsx", sheet_name=None)
-    courses = data['courses']  # 課程資料 sheet
-    students = data['students']  # 學生選課資料 sheet
+    courses = data['courses']
+    courses.columns = COURSES_COLUMNS
+    students = data['students']
 
     # 找出學生的選課清單
     student_courses = students[students['student_id'] == student_id]
-    new_course = courses[courses['course_id'] == course_id].iloc[0]
 
+    # 找出新課程資料
+    new_course = courses[courses['course_id'] == course_id]
+    if new_course.empty:
+        return f"課程 ID '{course_id}' 不存在"
+
+    # 提取新課程的第一筆資料
+    new_course = new_course.iloc[0]
+   
     # 檢查衝堂
     for _, course in student_courses.iterrows():
         course_info = courses[courses['course_id'] == course['course_id']].iloc[0]
-        if is_conflict(course_info['time'], new_course['time']):
+        if course_info["day"] == new_course["day"] and is_conflict(course_info['time'], new_course['time']):
             return "課程衝堂"
 
     # 檢查學分數
@@ -81,4 +86,6 @@ def add_course_route():
     return jsonify({"message": result})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    result = add_course('S001','C107')
+    print(result)
