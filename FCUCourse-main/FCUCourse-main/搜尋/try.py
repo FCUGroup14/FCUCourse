@@ -8,7 +8,7 @@ while True:
     print("請輸入課程代碼: ")
     print("請輸入課程指導老師名字: ")
     print("請選擇課程時間: ")
-    if  number = input("") :
+    if  number == input("") :
         found = False
         for i in range(len(df)):
             #iloc抓取[行,列]的資料（從0開始）
@@ -19,8 +19,8 @@ while True:
         if not found:
             print("課程代碼錯誤")
 
-    if name = input("") :
+    if name == input("") :
         
 
-    if time = input("") :
+    if time == input("") :
          
