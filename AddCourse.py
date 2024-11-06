@@ -58,13 +58,13 @@ def add_course(student_id, course_id):
         return "超出學分上限"
 
     # 檢查人數限制
-    if new_course['enrolled'] >= new_course['max_capacity']:
+    if new_course['enrolled'] == 0:
         return "課程已滿"
 
     # 加選成功，更新學生選課資料
     new_row = {'student_id': student_id, 'course_id': course_id}
     students = pd.concat([students, pd.DataFrame([new_row])], ignore_index=True)
-    courses.loc[courses['course_id'] == course_id, 'enrolled'] += 1
+    courses.loc[courses['course_id'] == course_id, 'enrolled'] -= 1
 
     # 儲存更新後的資料
     with pd.ExcelWriter("course_data.xlsx") as writer:
