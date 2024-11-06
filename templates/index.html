@@ -59,10 +59,29 @@
     {% if result %}
         <h2>查詢結果:</h2>
         <div>
-            <input type="submit" value="加選">{{ result | safe }}
+            {{ result | safe }}
+            
         </div>
     {% elif error %}
         <p style="color:red;">{{ error }}</p>
     {% endif %}
+    
+
+    <script>
+        function addCourse(studentId, courseId) {
+            fetch('/add_course', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ student_id: studentId, course_id: courseId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);  // 顯示加選結果訊息
+            })
+            .catch(error => console.error('加選失敗:', error));
+        }
+        </script>
 </body>
 </html>
