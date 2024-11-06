@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>課程查詢</title>
     <style>
-        /* 表格樣式 */
         .table {
             width: 100%;
             border-collapse: collapse;
@@ -22,24 +21,6 @@
         }
     </style>
 </head>
-
-<!--
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const form = document.querySelector("form");
-        const weekSelect = document.getElementById("week");
-        const timeSelect = document.getElementById("time");
-
-        form.addEventListener("submit", function(event) {
-            if (weekSelect.value && !timeSelect.value) {
-                event.preventDefault();
-                alert("請選擇課程時間。");
-                timeSelect.focus();
-            }
-        });
-    });
-</script>
--->
 
 <body>
     <h1>選課系統</h1>
@@ -77,8 +58,9 @@
 
     {% if result %}
         <h2>查詢結果:</h2>
-        <!-- 渲染表格結果 -->
-        <div>{{ result | safe }}</div>
+        <div>
+            <input type="submit" value="加選">{{ result | safe }}
+        </div>
     {% elif error %}
         <p style="color:red;">{{ error }}</p>
     {% endif %}
