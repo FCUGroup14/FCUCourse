@@ -5,7 +5,7 @@ from datetime import datetime
 # 創建 Flask 應用程序
 app = Flask(__name__)
 # 讀取 Excel 檔案
-df = pd.read_excel('data.xlsx')
+df = pd.read_excel("course_data.xlsx", sheet_name='courses')
 df.columns = ['星期', '時間', '編號', '名稱', '導師', '地點', '介紹', '分數分配', '學分', '總名額', '剩餘名額']
 
 from datetime import datetime
