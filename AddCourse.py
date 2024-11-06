@@ -73,19 +73,9 @@ def add_course(student_id, course_id):
 
     return "加選成功"
 
-@app.route('/add_course', methods=['POST'])
-def add_course_route():
-    data = request.get_json()  # 獲取 POST 請求的 JSON 資料
-    student_id = data.get('student_id')
-    course_id = data.get('course_id')
-    
-    # 執行加選邏輯
-    result = add_course(student_id, course_id)
-    
-    # 返回加選結果
-    return jsonify({"message": result})
 
-if __name__ == '__main__':
-    # app.run(debug=True)
-    result = add_course('S001','C107')
-    print(result)
+
+# if __name__ == '__main__':
+#     # app.run(debug=True)
+#     result = add_course('S001','C107')
+#     print(result)

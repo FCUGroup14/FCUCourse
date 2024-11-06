@@ -63,12 +63,12 @@
             
         </div>
     {% elif error %}
+       
         <p style="color:red;">{{ error }}</p>
     {% endif %}
-    
 
     <script>
-        function addCourse(studentId, courseId) {
+        function add_course(studentId, courseId) {
             fetch('/add_course', {
                 method: 'POST',
                 headers: {
@@ -76,11 +76,21 @@
                 },
                 body: JSON.stringify({ student_id: studentId, course_id: courseId })
             })
-            .then(response => response.json())
+
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
             .then(data => {
                 alert(data.message);  // 顯示加選結果訊息
+                document.getElementById("message").innerText = data.message; // 在頁面上顯示訊息
             })
-            .catch(error => console.error('加選失敗:', error));
+            .catch(error => {
+                console.error('加選失敗:', error);
+                document.getElementById("message").innerText = "加選失敗，請重試。";
+            });
         }
         </script>
 </body>

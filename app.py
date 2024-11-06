@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import pandas as pd
 from datetime import datetime
-
+import AddCourse
 app = Flask(__name__)
 df = pd.read_excel("course_data.xlsx", sheet_name='courses')
 df.columns = ['星期', '時間', '編號', '名稱', '導師', '地點', '介紹', '分數分配', '學分', '總名額', '剩餘名額']
@@ -57,7 +57,7 @@ def index():
             for _, row in query_result.iterrows():
                 # 為每個數據行動態添加 "加選" 按鈕
                 table_html += '<tr>' + ''.join([f'<td>{val}</td>' for val in row]) + \
-                            f'<td><button onclick="addCourse(\'S001\', \'{row["編號"]}\')">加選</button></td></tr>'
+                            f'<td><button onclick="add_course(\'S001\', \'{row["編號"]}\')">加選</button></td></tr>'
             
             table_html += '</table>'
             
@@ -74,6 +74,16 @@ def index():
 
 
     return render_template('index.html', result='', error='')
-
+@app.route('/add_course', methods=['POST'])
+def add_course_route():
+    data = request.get_json()  # 獲取 POST 請求的 JSON 資料
+    student_id = data.get('student_id')
+    course_id = data.get('course_id')
+    
+    # 執行加選邏輯
+    result = AddCourse.add_course(student_id, course_id)
+    
+    # 返回加選結果
+    return jsonify({"message": result})
 if __name__ == '__main__':
     app.run(debug=True)
