@@ -64,6 +64,8 @@ def add_course(student_id, course_id):
     # 加選成功，更新學生選課資料
     new_row = {'student_id': student_id, 'course_id': course_id}
     students = pd.concat([students, pd.DataFrame([new_row])], ignore_index=True)
+     # 排序學生選課資料（假設依 course_id 排序）
+    students = students.sort_values(by=['student_id', 'course_id']).reset_index(drop=True)
     courses.loc[courses['course_id'] == course_id, 'enrolled'] -= 1
 
     # 儲存更新後的資料
