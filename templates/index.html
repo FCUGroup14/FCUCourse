@@ -68,30 +68,31 @@
     {% endif %}
 
     <script>
-        function add_course(studentId, courseId) {
+        function add_course(student_id, course_id) {
             fetch('/add_course', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ student_id: studentId, course_id: courseId })
+                body: JSON.stringify({ student_id: student_id, course_id: course_id })
             })
-
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                alert(data.message);  // 顯示加選結果訊息
-                document.getElementById("message").innerText = data.message; // 在頁面上顯示訊息
+                console.log("Server response:", data); // 調試信息
+                if (data.redirect) {
+                    console.log("Redirecting to:", data.redirect); // 調試信息
+                    window.location.href = data.redirect;
+                } else {
+                    alert(data.message);
+                }
             })
             .catch(error => {
-                console.error('加選失敗:', error);
-                document.getElementById("message").innerText = "加選失敗，請重試。";
+                console.error('加選過程中出現錯誤:', error);
             });
         }
         </script>
+             
 </body>
 </html>
+// 加選成功後跳轉到課表頁面
+           

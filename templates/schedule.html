@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的課表</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #333;
+        }
+        .time-col {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+        .course-cell {
+            background-color: #e6f7ff;
+            color: #333;
+        }
+        .course-name {
+            font-weight: bold;
+        }
+        .course-location {
+            color: #888;
+            font-size: 12px;
+            display: block;
+            margin-top: 4px;
+        }
+        .empty-cell {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h2  style="text-align:center" >My Schedule</h2>
+    <table>
+        <tr>
+            <th>Time</th>
+            {% for day in days_of_week %}
+                <th>{{ day }}</th>
+            {% endfor %}
+        </tr>
+        {% for time in time_slots %}
+        <tr>
+            <td class="time-col">{{ time }}</td>
+            {% for day in days_of_week %}
+                {% if schedule[day][time] %}
+                    <td class="course-cell">
+                        <div class="course-name">{{ schedule[day][time].name }}</div>
+                        <div class="course-location">• {{ schedule[day][time].location }}</div>
+                    </td>
+                {% else %}
+                    <td class="empty-cell"></td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

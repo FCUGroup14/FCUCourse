@@ -67,6 +67,7 @@ def add_course(student_id, course_id):
      # 排序學生選課資料（假設依 course_id 排序）
     students = students.sort_values(by=['student_id', 'course_id']).reset_index(drop=True)
     courses.loc[courses['course_id'] == course_id, 'enrolled'] -= 1
+    
 
     # 儲存更新後的資料
     with pd.ExcelWriter("course_data.xlsx") as writer:
