@@ -27,6 +27,7 @@
         .time-col {
             background-color: #f9f9f9;
             font-weight: bold;
+            width: 80px;
         }
         .course-cell {
             background-color: #e6f7ff;
@@ -47,10 +48,10 @@
     </style>
 </head>
 <body>
-    <h2  style="text-align:center" >My Schedule</h2>
+    <h2>我的課表</h2>
     <table>
         <tr>
-            <th>Time</th>
+            <th>時間</th>
             {% for day in days_of_week %}
                 <th>{{ day }}</th>
             {% endfor %}
@@ -60,10 +61,13 @@
             <td class="time-col">{{ time }}</td>
             {% for day in days_of_week %}
                 {% if schedule[day][time] %}
-                    <td class="course-cell">
-                        <div class="course-name">{{ schedule[day][time].name }}</div>
-                        <div class="course-location">• {{ schedule[day][time].location }}</div>
+                    <!-- 如果該課程有 rowspan 設定，使用 rowspan 來跨越多個時段顯示 -->
+                    <td class="course-cell" rowspan="{{ schedule[day][time].rowspan }}">
+                        <div class="course-name">{{ schedule[day][time].course_info.name }}</div>
+                        <div class="course-location">• {{ schedule[day][time].course_info.location }}</div>
                     </td>
+                {% elif schedule[day][time] is not none %}
+                    <!-- 跳過空的時間格以防止顯示重複 -->
                 {% else %}
                     <td class="empty-cell"></td>
                 {% endif %}
