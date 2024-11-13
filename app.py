@@ -148,3 +148,28 @@ def student_schedule(student_id):
     return render_template('schedule.html', schedule=schedule_data, time_slots=time_slots, days_of_week=days_of_week)
 if __name__ == '__main__':
     app.run(debug=True)
+
+# 在現有的 app.py 中添加以下路由
+
+@app.route('/course_management')
+def course_management():
+    return render_template('course_management.html')
+
+@app.route('/get_courses')
+def get_courses():
+    try:
+        df = pd.read_excel("course_data.xlsx", sheet_name='courses')
+        courses = df.to_dict('records')
+        return jsonify({"courses": courses})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get_course/<course_id>')
+def get_course(course_id):
+    try:
+        df = pd.read_excel("course_data.xlsx", sheet_name='courses')
+        course = df[df['course_id'] == course_id].to_dict('records')[0]
+        return jsonify(course)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+        
