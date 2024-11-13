@@ -26,9 +26,15 @@ def is_time_contained(selected_time, data_time):
 
 
 
-
 @app.route('/', methods=['GET', 'POST'])
+def main():
+    return render_template('first.html')  # 修改這裡，將首頁設為 first.html
+
+
+@app.route('/student', methods=['GET', 'POST'])
 def index():
+    df = pd.read_excel(file_path, sheet_name='courses')
+    df.columns = ['星期', '時間', '編號', '名稱', '導師', '地點', '介紹', '分數分配', '學分', '總名額', '剩餘名額']
     if request.method == 'POST':
         number = request.form['number']
         name = request.form['name']
@@ -146,16 +152,12 @@ def student_schedule(student_id):
             print(f"錯誤：無法將課程 '{course_info['name']}' 匹配至預定的時間範圍")
 
     return render_template('schedule.html', schedule=schedule_data, time_slots=time_slots, days_of_week=days_of_week)
-if __name__ == '__main__':
-    app.run(debug=True)
 
-# 在現有的 app.py 中添加以下路由
-
-@app.route('/course_management')
+@app.route('/course_management', methods=['GET', 'POST'])
 def course_management():
-    return render_template('course_management.html')
+    return render_template('course-management.html')
 
-@app.route('/get_courses')
+@app.route('/get_courses', methods=['GET', 'POST'])
 def get_courses():
     try:
         df = pd.read_excel("course_data.xlsx", sheet_name='courses')
@@ -164,7 +166,7 @@ def get_courses():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/get_course/<course_id>')
+@app.route('/get_course/<course_id>', methods=['GET', 'POST'])
 def get_course(course_id):
     try:
         df = pd.read_excel("course_data.xlsx", sheet_name='courses')
@@ -172,4 +174,7 @@ def get_course(course_id):
         return jsonify(course)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+if __name__ == '__main__':
+    app.run(debug=True)
         

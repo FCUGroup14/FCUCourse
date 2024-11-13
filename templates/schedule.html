@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -67,7 +67,8 @@
                         <div class="course-location">• {{ schedule[day][time].course_info.location }}</div>
                     </td>
                 {% elif schedule[day][time] is not none %}
-                    <!-- 跳過空的時間格以防止顯示重複 -->
+                    <!-- 跳過空的時間格 -->
+                    <td class="empty-cell"></td>
                 {% else %}
                     <td class="empty-cell"></td>
                 {% endif %}
@@ -75,5 +76,6 @@
         </tr>
         {% endfor %}
     </table>
+    <button type="button" onclick="window.location.href='/student'">返回</button>
 </body>
 </html>
