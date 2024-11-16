@@ -4,6 +4,7 @@ from datetime import datetime
 import sys
 import io
 
+
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 app = Flask(__name__)
@@ -30,11 +31,10 @@ def is_conflict(time1, time2):
 
 def add_course(student_id, course_id):
     # 讀取 Excel 檔案，設置 courses 表的列名
-    data_one = pd.read_excel("course_data.xlsx", sheet_name=None)
-    courses = data_one['courses']
+    data = pd.read_excel("course_data.xlsx", sheet_name=None)
+    courses = data['courses']
     courses.columns = COURSES_COLUMNS
-    data_two = pd.read_excel("student_data.xlsx", sheet_name=None)
-    students = data_two['students']
+    students = data['students']
 
     # 找出學生的選課清單
     student_courses = students[students['student_id'] == student_id]
@@ -73,10 +73,8 @@ def add_course(student_id, course_id):
     # 儲存更新後的資料
     with pd.ExcelWriter("course_data.xlsx") as writer:
         courses.to_excel(writer, sheet_name="courses", index=False)
-
-    with pd.ExcelWriter("student_data.xlsx") as writer:
-
         students.to_excel(writer, sheet_name="students", index=False)
+
     return "加選成功"
 
 

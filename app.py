@@ -164,7 +164,9 @@ def edit_course():
             if key in ADMIN_COLUMNS:
                 df.loc[df['course_id'] == course_id, key] = value
                 
-        df.to_excel(file_path, sheet_name='courses', index=False)
+        #df.to_excel(file_path, sheet_name='courses', index=False)
+        with pd.ExcelWriter(file_path, mode="a", if_sheet_exists="replace", engine="openpyxl") as writer:
+            df.to_excel(writer, sheet_name='courses', index=False)
         return jsonify({"success": True, "message": "課程信息更新成功"})
         
     except Exception as e:
@@ -185,8 +187,10 @@ def delete_course():
             
         course_info = df[df['course_id'] == course_id].iloc[0]
         df = df[df['course_id'] != course_id]
-        df.to_excel(file_path, sheet_name='courses', index=False)
-        
+        #df.to_excel(file_path, sheet_name='courses', index=False)
+        with pd.ExcelWriter(file_path, mode="a", if_sheet_exists="replace", engine="openpyxl") as writer:
+            df.to_excel(writer, sheet_name='courses', index=False)
+
         return jsonify({
             "success": True, 
             "message": f"課程 {course_id} ({course_info['course_name']}) 已成功刪除"
@@ -198,8 +202,7 @@ def delete_course():
 @app.route('/schedule/<student_id>')
 def student_schedule(student_id):
     df = load_student_data()
-
-    student_courses_df = pd.read_excel("student_data.xlsx", sheet_name='students')
+    student_courses_df = pd.read_excel(file_path, sheet_name='students')
 
     selected_courses = student_courses_df[student_courses_df['student_id'] == student_id]['course_id']
 
