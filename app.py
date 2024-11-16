@@ -198,7 +198,8 @@ def delete_course():
 @app.route('/schedule/<student_id>')
 def student_schedule(student_id):
     df = load_student_data()
-    student_courses_df = pd.read_excel(file_path, sheet_name='students')
+
+    student_courses_df = pd.read_excel("student_data.xlsx", sheet_name='students')
 
     selected_courses = student_courses_df[student_courses_df['student_id'] == student_id]['course_id']
 

@@ -30,9 +30,11 @@ def is_conflict(time1, time2):
 
 def add_course(student_id, course_id):
     # 讀取 Excel 檔案，設置 courses 表的列名
-    courses = pd.read_excel("course_data.xlsx", sheet_name='courses')
+    data_one = pd.read_excel("course_data.xlsx", sheet_name=None)
+    courses = data_one['courses']
     courses.columns = COURSES_COLUMNS
-    students = pd.read_excel("student_data.xlsx", sheet_name='students')
+    data_two = pd.read_excel("student_data.xlsx", sheet_name=None)
+    students = data_two['students']
 
     # 找出學生的選課清單
     student_courses = students[students['student_id'] == student_id]
