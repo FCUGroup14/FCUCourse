@@ -60,15 +60,12 @@
         <tr>
             <td class="time-col">{{ time }}</td>
             {% for day in days_of_week %}
-                {% if schedule[day][time] %}
-                    <!-- 如果該課程有 rowspan 設定，使用 rowspan 來跨越多個時段顯示 -->
-                    <td class="course-cell" rowspan="{{ schedule[day][time].rowspan }}">
-                        <div class="course-name">{{ schedule[day][time].course_info.name }}</div>
-                        <div class="course-location">• {{ schedule[day][time].course_info.location }}</div>
+                {% set cell = schedule[day].get(time) %}
+                {% if cell %}
+                    <td class="course-cell">
+                        <div class="course-name">{{ cell.course_info.name }}</div>
+                        <div class="course-location">• {{ cell.course_info.location }}</div>
                     </td>
-                {% elif schedule[day][time] is not none %}
-                    <!-- 跳過空的時間格 -->
-                    <td class="empty-cell"></td>
                 {% else %}
                     <td class="empty-cell"></td>
                 {% endif %}

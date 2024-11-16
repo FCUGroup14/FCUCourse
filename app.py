@@ -205,25 +205,27 @@ def student_schedule(student_id):
     if selected_courses.empty:
         return render_template('schedule.html', schedule={}, time_slots=time_slots, days_of_week=days_of_week)
 
+    # 過濾學生的課程數據
     student_schedule = df[df['編號'].isin(selected_courses)]
+    
+    # 初始化空的課表資料
     schedule_data = {day: {time: None for time in time_slots} for day in days_of_week}
 
+    # 填入課表資料
     for _, row in student_schedule.iterrows():
         day = row['星期']
         course_time = row['時間']
         course_info = {'name': row['名稱'], 'location': row['地點']}
-        
+
+        # 獲取課程覆蓋的時間段
         matching_slots = [slot for slot in time_slots if overlaps(course_time, slot)]
         
         if day in schedule_data and matching_slots:
-            rowspan = len(matching_slots)
-            first_slot = matching_slots[0]
-            schedule_data[day][first_slot] = {'course_info': course_info, 'rowspan': rowspan}
-            
-            for slot in matching_slots[1:]:
-                schedule_data[day][slot] = None
+            for slot in matching_slots:
+                schedule_data[day][slot] = {'course_info': course_info}
 
     return render_template('schedule.html', schedule=schedule_data, time_slots=time_slots, days_of_week=days_of_week)
+
 
 time_slots = [
     "08:10~09:00", "09:10~10:00", "10:10~11:00",
