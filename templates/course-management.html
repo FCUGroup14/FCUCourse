@@ -1,128 +1,219 @@
-<!-- templates/course_management.html -->
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>課程管理系統</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">  
+    <meta charset="UTF-8">
     <style>
-        .table-responsive {
+        body {
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
         }
-        .btn-edit, .btn-delete {
-            margin: 2px;
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
         }
-        .edit-form {
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .button {
+            padding: 5px 10px;
+            margin: 2px;
+            cursor: pointer;
+            border: none;
+            border-radius: 3px;
+        }
+        .edit-button {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+        }
+        #editForm {
             display: none;
             margin-top: 20px;
             padding: 20px;
             border: 1px solid #ddd;
-            border-radius: 5px;
             background-color: #f9f9f9;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <h2>課程管理系統</h2>
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>課程代碼</th>
-                        <th>課程名稱</th>
-                        <th>教師</th>
-                        <th>時間</th>
-                        <th>地點</th>
-                        <th>學分</th>
-                        <th>名額</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="courseTableBody">
-                    <!-- 課程數據將通過JavaScript動態插入 -->
-                </tbody>
-            </table>
-        </div>
+    <h1>課程管理系統</h1>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>課程代碼</th>
+                <th>課程名稱</th>
+                <th>教師</th>
+                <th>時間</th>
+                <th>地點</th>
+                <th>學分</th>
+                <th>名額</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for course in courses %}
+            <tr>
+                <td>{{ course.course_id }}</td>
+                <td>{{ course.course_name }}</td>
+                <td>{{ course.teacher }}</td>
+                <td>{{ course.time }}</td>
+                <td>{{ course.location }}</td>
+                <td>{{ course.credits }}</td>
+                <td>{{ course.max_capacity }}</td>
+                <td>
+                    <button class="button edit-button" onclick="editCourse('{{ course.course_id }}')">編輯</button>
+                    <button class="button delete-button" onclick="showDeleteConfirm('{{ course.course_id }}')">刪除</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-        <!-- 編輯表單 -->
-        <div id="editForm" class="edit-form">
-            <h3>編輯課程信息</h3>
-            <form id="courseEditForm">
-                <input type="hidden" id="editCourseId">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="editCourseName" class="form-label">課程名稱</label>
-                        <input type="text" class="form-control" id="editCourseName" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="editTeacher" class="form-label">教師</label>
-                        <input type="text" class="form-control" id="editTeacher" required>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="editDay" class="form-label">星期</label>
-                        <select class="form-control" id="editDay" required>
-                            <option value="星期一">星期一</option>
-                            <option value="星期二">星期二</option>
-                            <option value="星期三">星期三</option>
-                            <option value="星期四">星期四</option>
-                            <option value="星期五">星期五</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="editTime" class="form-label">時間</label>
-                        <input type="text" class="form-control" id="editTime" placeholder="HH:MM~HH:MM" required>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="editLocation" class="form-label">地點</label>
-                        <input type="text" class="form-control" id="editLocation" required>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label for="editCredits" class="form-label">學分</label>
-                        <input type="number" class="form-control" id="editCredits" min="0" required>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="editCapacity" class="form-label">總名額</label>
-                        <input type="number" class="form-control" id="editCapacity" min="0" required>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="editInfo" class="form-label">課程說明</label>
-                        <textarea class="form-control" id="editInfo"></textarea>
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <button type="submit" class="btn btn-primary">保存</button>
-                    <button type="button" class="btn btn-secondary" onclick="hideEditForm()">取消</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 確認刪除的Modal -->
-    <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">確認刪除</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    確定要刪除這門課程嗎？此操作無法恢復。
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-danger" id="confirmDelete">確定刪除</button>
-                </div>
+    <div id="editForm">
+        <h2>編輯課程信息</h2>
+        <form id="courseForm">
+            <input type="hidden" id="courseId">
+            <div class="form-group">
+                <label for="courseName">課程名稱</label>
+                <input type="text" id="courseName" required>
             </div>
-        </div>
+            <div class="form-group">
+                <label for="teacher">教師</label>
+                <input type="text" id="teacher" required>
+            </div>
+            <div class="form-group">
+                <label for="time">時間</label>
+                <input type="text" id="time" required>
+            </div>
+            <div class="form-group">
+                <label for="location">地點</label>
+                <input type="text" id="location" required>
+            </div>
+            <div class="form-group">
+                <label for="credits">學分</label>
+                <input type="number" id="credits" required min="0" step="0.5">
+            </div>
+            <div class="form-group">
+                <label for="maxCapacity">名額</label>
+                <input type="number" id="maxCapacity" required min="0">
+            </div>
+            <button type="submit" class="button edit-button">保存</button>
+            <button type="button" class="button" onclick="cancelEdit()">取消</button>
+        </form>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        let currentCourseId = null;
+
+        function editCourse(courseId) {
+            currentCourseId = courseId;
+            fetch(`/get_course/${courseId}`)
+                .then(response => response.json())
+                .then(course => {
+                    document.getElementById('courseId').value = course.course_id;
+                    document.getElementById('courseName').value = course.course_name;
+                    document.getElementById('teacher').value = course.teacher;
+                    document.getElementById('time').value = course.time;
+                    document.getElementById('location').value = course.location;
+                    document.getElementById('credits').value = course.credits;
+                    document.getElementById('maxCapacity').value = course.max_capacity;
+                    document.getElementById('editForm').style.display = 'block';
+                })
+                .catch(error => {
+                    alert('獲取課程信息失敗');
+                });
+        }
+
+        function cancelEdit() {
+            document.getElementById('editForm').style.display = 'none';
+            document.getElementById('courseForm').reset();
+        }
+
+        function showDeleteConfirm(courseId) {
+            if (confirm('確定要刪除這門課程嗎？此操作無法恢復。')) {
+                deleteCourse(courseId);
+            }
+        }
+
+        function deleteCourse(courseId) {
+            fetch('/delete_course', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ course_id: courseId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                alert('刪除失敗，請稍後再試');
+            });
+        }
+
+        document.getElementById('courseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = {
+                course_id: currentCourseId,
+                updated_info: {
+                    course_name: document.getElementById('courseName').value,
+                    teacher: document.getElementById('teacher').value,
+                    time: document.getElementById('time').value,
+                    location: document.getElementById('location').value,
+                    credits: document.getElementById('credits').value,
+                    max_capacity: document.getElementById('maxCapacity').value
+                }
+            };
+
+            fetch('/edit_course', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                alert('編輯失敗，請稍後再試');
+            });
+        });
+    </script>
 </body>
 </html>
