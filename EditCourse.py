@@ -3,31 +3,45 @@ import pandas as pd
 import os
 
 class CourseEditor:
-    def __init__(self, file_path="course_data.xlsx"):
-        self.file_path = file_path
-        # 修改為與你的Excel文件完全匹配的列名
+    def __init__(self, course_file="course_data.xlsx", student_file="student_data.xlsx"):
+        self.course_file = course_file
+        self.student_file = student_file
         self.COURSES_COLUMNS = [
             'day', 'time', 'course_id', 'course_name', 'teacher',
             'location', 'extra_info', 'grades', 'credits',
             'max_capacity', 'enrolled'
         ]
 
-    def load_data(self):
-        """載入Excel數據"""
+    def load_course_data(self):
+        """載入課程Excel數據"""
         try:
-            df = pd.read_excel(self.file_path, sheet_name='courses')
-            # 確保列名完全匹配
+            df = pd.read_excel(self.course_file, sheet_name='courses')
             df.columns = self.COURSES_COLUMNS
             return df
         except Exception as e:
-            print(f"Error loading data: {e}")
+            print(f"Error loading course data: {e}")
             return pd.DataFrame(columns=self.COURSES_COLUMNS)
+
+    def load_student_data(self):
+        """載入學生選課數據"""
+        try:
+            return pd.read_excel(self.student_file, sheet_name='students')
+        except Exception as e:
+            print(f"Error loading student data: {e}")
+            return pd.DataFrame(columns=['student_id', 'course_id'])
+
+    def save_course_data(self, df):
+        """保存課程數據"""
+        df.to_excel(self.course_file, sheet_name='courses', index=False)
+
+    def save_student_data(self, df):
+        """保存學生選課數據"""
+        df.to_excel(self.student_file, sheet_name='students', index=False)
 
     def get_all_courses(self):
         """獲取所有課程信息"""
         try:
-            df = self.load_data()
-            # 直接返回需要顯示的欄位
+            df = self.load_course_data()
             courses_list = []
             for _, row in df.iterrows():
                 course = {
@@ -48,10 +62,10 @@ class CourseEditor:
     def edit_course(self, course_id, updated_info):
         """編輯課程信息"""
         try:
-            df = self.load_data()
+            course_df = self.load_course_data()
             
             # 檢查課程是否存在
-            if course_id not in df['course_id'].values:
+            if course_id not in course_df['course_id'].values:
                 return False, "課程不存在"
             
             # 驗證更新的信息
@@ -66,8 +80,8 @@ class CourseEditor:
             if 'max_capacity' in updated_info:
                 try:
                     max_capacity = int(updated_info['max_capacity'])
-                    current_enrolled = df.loc[
-                        df['course_id'] == course_id, 
+                    current_enrolled = course_df.loc[
+                        course_df['course_id'] == course_id, 
                         'enrolled'
                     ].iloc[0]
                     
@@ -77,13 +91,12 @@ class CourseEditor:
                     return False, "無效的名額數"
 
             # 更新課程信息
-            # 這裡的鍵名已經與Excel完全匹配
             for key, value in updated_info.items():
                 if key in self.COURSES_COLUMNS:
-                    df.loc[df['course_id'] == course_id, key] = value
+                    course_df.loc[course_df['course_id'] == course_id, key] = value
 
-            # 保存更新
-            df.to_excel(self.file_path, sheet_name='courses', index=False)
+            # 保存課程更新
+            self.save_course_data(course_df)
             return True, "課程信息更新成功"
 
         except Exception as e:
@@ -93,20 +106,26 @@ class CourseEditor:
     def delete_course(self, course_id):
         """刪除課程"""
         try:
-            df = self.load_data()
+            course_df = self.load_course_data()
+            student_df = self.load_student_data()
             
             # 檢查課程是否存在
-            if course_id not in df['course_id'].values:
+            if course_id not in course_df['course_id'].values:
                 return False, "課程不存在"
             
             # 獲取課程信息用於日誌記錄
-            course_info = df[df['course_id'] == course_id].iloc[0]
+            course_info = course_df[course_df['course_id'] == course_id].iloc[0]
             
             # 刪除課程
-            df = df[df['course_id'] != course_id]
+            course_df = course_df[course_df['course_id'] != course_id]
+            
+            # 從學生選課記錄中刪除相關課程
+            student_df = student_df[student_df['course_id'] != course_id]
             
             # 保存更新
-            df.to_excel(self.file_path, sheet_name='courses', index=False)
+            self.save_course_data(course_df)
+            self.save_student_data(student_df)
+            
             return True, f"課程 {course_id} ({course_info['course_name']}) 已成功刪除"
 
         except Exception as e:
@@ -126,7 +145,7 @@ def course_management():
 @app.route('/get_course/<course_id>')
 def get_course_route(course_id):
     """獲取特定課程信息的API路由"""
-    df = course_editor.load_data()
+    df = course_editor.load_course_data()
     course = df[df['course_id'] == course_id].to_dict('records')
     if course:
         return jsonify(course[0])
