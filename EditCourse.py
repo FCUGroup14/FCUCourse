@@ -28,61 +28,61 @@ class CourseEditor:
             return pd.DataFrame()
 
     def save_data(self, courses_df, students_df):
-    """保存課程和學生數據，同時保留其他表單"""
-    try:
-        # 載入整個 Excel 文件
-        workbook = openpyxl.load_workbook(self.file_path)
+        """保存課程和學生數據，同時保留其他表單"""
+        try:
+            # 載入整個 Excel 文件
+            workbook = openpyxl.load_workbook(self.file_path)
 
-        # 保存原有的表單（保留 'students' 表單）
-        if 'courses' in workbook.sheetnames:
-            del workbook['courses']
-        
-        # 使用 ExcelWriter 存回文件，保證兩個表單都被更新
-        with pd.ExcelWriter(self.file_path, engine='openpyxl') as writer:
-            writer.book = workbook  # 使用原來的工作簿
-            courses_df.to_excel(writer, sheet_name='courses', index=False)  # 保存課程表
-            students_df.to_excel(writer, sheet_name='students', index=False)  # 保存學生表
+            # 保存原有的表單（保留 'students' 表單）
+            if 'courses' in workbook.sheetnames:
+                del workbook['courses']
+            
+            # 使用 ExcelWriter 存回文件，保證兩個表單都被更新
+            with pd.ExcelWriter(self.file_path, engine='openpyxl') as writer:
+                writer.book = workbook  # 使用原來的工作簿
+                courses_df.to_excel(writer, sheet_name='courses', index=False)  # 保存課程表
+                students_df.to_excel(writer, sheet_name='students', index=False)  # 保存學生表
 
-    except Exception as e:
-        print(f"Error saving data: {e}")
+        except Exception as e:
+            print(f"Error saving data: {e}")
 
 
 
     def delete_course(self, course_id):
-    """刪除課程，並從學生資料中刪除選修該課程的學生"""
-    try:
-        # 載入課程和學生數據
-        courses_df = self.load_data('courses')
-        students_df = self.load_data('students')
-        
-        # 檢查課程是否存在
-        if course_id not in courses_df['course_id'].values:
-            return False, "課程不存在"
-        
-        # 獲取課程信息
-        course_info = courses_df[courses_df['course_id'] == course_id].iloc[0]
+        """刪除課程，並從學生資料中刪除選修該課程的學生"""
+        try:
+            # 載入課程和學生數據
+            courses_df = self.load_data('courses')
+            students_df = self.load_data('students')
+            
+            # 檢查課程是否存在
+            if course_id not in courses_df['course_id'].values:
+                return False, "課程不存在"
+            
+            # 獲取課程信息
+            course_info = courses_df[courses_df['course_id'] == course_id].iloc[0]
 
-        # 刪除 'courses' 表單中的課程
-        courses_df = courses_df[courses_df['course_id'] != course_id]
+            # 刪除 'courses' 表單中的課程
+            courses_df = courses_df[courses_df['course_id'] != course_id]
 
-        # 只刪除 'students' 表單中選修該課程的學生資料
-        students_df = students_df[students_df['course_id'] != course_id]
+            # 只刪除 'students' 表單中選修該課程的學生資料
+            students_df = students_df[students_df['course_id'] != course_id]
 
-        # 使用 openpyxl 打開 Excel 檔案
-        workbook = openpyxl.load_workbook(self.file_path)
+            # 使用 openpyxl 打開 Excel 檔案
+            workbook = openpyxl.load_workbook(self.file_path)
+            
+            # 保存更新後的資料，注意不會刪除其他表單
+            with pd.ExcelWriter(self.file_path, engine='openpyxl') as writer:
+                writer.book = workbook  # 使用原來的工作簿
+                # 更新 courses 和 students 表單
+                courses_df.to_excel(writer, sheet_name='courses', index=False)
+                students_df.to_excel(writer, sheet_name='students', index=False)
+            
+            return True, f"課程 {course_id} ({course_info['course_name']}) 已成功刪除"
         
-        # 保存更新後的資料，注意不會刪除其他表單
-        with pd.ExcelWriter(self.file_path, engine='openpyxl') as writer:
-            writer.book = workbook  # 使用原來的工作簿
-            # 更新 courses 和 students 表單
-            courses_df.to_excel(writer, sheet_name='courses', index=False)
-            students_df.to_excel(writer, sheet_name='students', index=False)
-        
-        return True, f"課程 {course_id} ({course_info['course_name']}) 已成功刪除"
-    
-    except Exception as e:
-        print(f"Error deleting course: {e}")
-        return False, f"刪除失敗: {str(e)}"
+        except Exception as e:
+            print(f"Error deleting course: {e}")
+            return False, f"刪除失敗: {str(e)}"
 
 
 
