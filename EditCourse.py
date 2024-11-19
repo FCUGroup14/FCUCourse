@@ -33,7 +33,7 @@ class CourseEditor:
             # 載入整個 Excel 文件
             workbook = openpyxl.load_workbook(self.file_path)
 
-            # 保存原有的表單（保留 'students' 表單）
+            # 刪除舊的 'courses' 表單，重新保存
             if 'courses' in workbook.sheetnames:
                 del workbook['courses']
             
@@ -45,8 +45,6 @@ class CourseEditor:
 
         except Exception as e:
             print(f"Error saving data: {e}")
-
-
 
     def delete_course(self, course_id):
         """刪除課程，並從學生資料中刪除選修該課程的學生"""
@@ -65,27 +63,20 @@ class CourseEditor:
             # 刪除 'courses' 表單中的課程
             courses_df = courses_df[courses_df['course_id'] != course_id]
 
-            # 只刪除 'students' 表單中選修該課程的學生資料
+            # 刪除 'students' 表單中選修該課程的學生資料
             students_df = students_df[students_df['course_id'] != course_id]
 
-            # 使用 openpyxl 打開 Excel 檔案
-            workbook = openpyxl.load_workbook(self.file_path)
-            
-            # 保存更新後的資料，注意不會刪除其他表單
-            with pd.ExcelWriter(self.file_path, engine='openpyxl') as writer:
-                writer.book = workbook  # 使用原來的工作簿
-                # 更新 courses 和 students 表單
-                courses_df.to_excel(writer, sheet_name='courses', index=False)
-                students_df.to_excel(writer, sheet_name='students', index=False)
-            
+            # 保存更新後的資料
+            self.save_data(courses_df, students_df)
             return True, f"課程 {course_id} ({course_info['course_name']}) 已成功刪除"
         
         except Exception as e:
             print(f"Error deleting course: {e}")
             return False, f"刪除失敗: {str(e)}"
 
-
-
+    def get_all_courses(self):
+        """獲取所有課程"""
+        return self.load_data('courses')
 
 @app.route('/delete_course', methods=['POST'])
 def delete_course_route():
@@ -105,14 +96,11 @@ def delete_course_route():
     except Exception as e:
         return jsonify({"success": False, "message": f"處理請求時發生錯誤: {str(e)}"}), 500
 
-
-
 @app.route('/course_management')
 def course_management():
     """課程管理頁面路由"""
-    courses = course_editor.get_all_courses()
+    courses = course_editor.get_all_courses().to_dict('records')
     return render_template('course-management.html', courses=courses)
-
 
 @app.route('/get_course/<course_id>')
 def get_course_route(course_id):
@@ -122,7 +110,6 @@ def get_course_route(course_id):
     if course:
         return jsonify(course[0])
     return jsonify({"error": "課程不存在"}), 404
-
 
 @app.route('/edit_course', methods=['POST'])
 def edit_course_route():
@@ -143,7 +130,6 @@ def edit_course_route():
 
     except Exception as e:
         return jsonify({"success": False, "message": f"處理請求時發生錯誤: {str(e)}"}), 500
-
 
 if __name__ == '__main__':
     course_editor = CourseEditor()

@@ -69,27 +69,36 @@
 
     <script>
         function add_course(student_id, course_id) {
+           
             fetch('/add_course', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ student_id: student_id, course_id: course_id })
+                body: JSON.stringify({ student_id: student_id, course_id: course_id }),
             })
-            .then(response => response.json())
+            .then(response => {
+                // 檢查 response 的 HTTP 狀態碼
+                if (!response.ok) {
+                    throw new Error('加選請求失敗，請稍後再試');
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log("Server response:", data); // 調試信息
+                console.log("Server response:", data);  // 調試信息
                 if (data.redirect) {
-                    console.log("Redirecting to:", data.redirect); // 調試信息
-                    window.location.href = data.redirect;
+                    console.log("Redirecting to:", data.redirect);  // 調試信息
+                    window.location.href = data.redirect;  // 跳轉到學生課表頁面
                 } else {
-                    alert(data.message);
+                    alert(data.message);  // 顯示錯誤消息
                 }
             })
             .catch(error => {
-                console.error('加選過程中出現錯誤:', error);
+                console.error('加選過程中出現錯誤:', error);  // 捕獲並顯示錯誤
+                alert('加選過程中出現錯誤，請稍後再試。');  // 用戶友好的錯誤提示
             });
         }
+
         </script>
         <br>
         <button type="button" onclick="window.location.href='/'">返回</button>

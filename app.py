@@ -101,13 +101,13 @@ def add_course_route():
     data = request.get_json()
     student_id = data.get('student_id')
     course_id = data.get('course_id')
-    result = AddCourse.add_course(student_id, course_id)
-    
-    if "成功" in result:
+    success, result_message = AddCourse.add_course(student_id, course_id)  # 拆解返回結果
+
+    if success:  # 檢查是否成功
         redirect_url = url_for('student_schedule', student_id=student_id)
-        return jsonify({"redirect": redirect_url})
+        return jsonify({"redirect": redirect_url})  # 返回重定向的 URL
     else:
-        return jsonify({"message": result})
+        return jsonify({"message": result_message})  # 如果失敗，返回錯誤信息
 
 # 課程管理相關路由
 @app.route('/course_management')
@@ -248,3 +248,4 @@ def overlaps(time_range1, time_range2):
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
