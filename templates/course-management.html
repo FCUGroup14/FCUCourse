@@ -72,8 +72,6 @@
                 <th>教師</th>
                 <th>時間</th>
                 <th>地點</th>
-                <th>介紹</th>
-                <th>分數分配</th>
                 <th>學分</th>
                 <th>名額</th>
                 <th>操作</th>
@@ -87,8 +85,6 @@
                 <td>{{ course.teacher }}</td>
                 <td>{{ course.time }}</td>
                 <td>{{ course.location }}</td>
-                <td>{{ course.extra_info }}</td>
-                <td>{{ course.grades }}</td>
                 <td>{{ course.credits }}</td>
                 <td>{{ course.max_capacity }}</td>
                 <td>
@@ -121,11 +117,11 @@
                 <input type="text" id="location" required>
             </div>
             <div class="form-group">
-                <label for="extra_info">地點</label>
+                <label for="extra_info">介紹</label>
                 <input type="text" id="extra_info" required>
             </div>
             <div class="form-group">
-                <label for="grades">地點</label>
+                <label for="grades">分數分配</label>
                 <input type="text" id="grades" required>
             </div>
             <div class="form-group">
